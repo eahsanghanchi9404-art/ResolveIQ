@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ResolveIQ — Intelligent Connectivity Support Assistant</title>
+  <style>
+    :root{
+      --bg:#f4f7fb;
+      --bg-soft:#eef3f9;
+      --card:#ffffff;
+      --card-2:#f8fbff;
+      --line:#dbe5f3;
+      --text:#1e293b;
+      --muted:#64748b;
+      --brand:#2563eb;
+      --brand-2:#3b82f6;
+      --brand-3:#60a5fa;
+      --good:#0ea5a3;
+      --warn:#f59e0b;
+      --bad:#ef4444;
+      --shadow: 0 14px 40px rgba(37, 99, 235, 0.08);
+      --shadow-2: 0 18px 55px rgba(15, 23, 42, 0.10);
+      --radius: 20px;
+    }
+
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: "Segoe UI", Inter, system-ui, -apple-system, BlinkMacSystemFont, Arial, sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(900px 450px at 10% 0%, rgba(37,99,235,.08), transparent 45%),
+        radial-gradient(700px 400px at 90% 5%, rgba(96,165,250,.08), transparent 40%),
+        linear-gradient(180deg, #f8fbff 0%, var(--bg) 45%, #eef4fb 100%);
+    }
+
+    .shell{
+      width:min(1480px, 96vw);
+      margin:0 auto;
+      padding:20px 0 24px;
+      min-height:100vh;
+      display:grid;
+      grid-template-rows:auto 1fr;
+      gap:16px;
+    }
+
+    .topbar{
+      background:linear-gradient(135deg, #ffffff 0%, #f8fbff 100%);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      padding:18px 20px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width:0;
+    }
+    .logo{
+      width:54px;
+      height:54px;
+      border-radius:18px;
+      background:linear-gradient(135deg, var(--brand), var(--brand-3));
+      display:grid;
+      place-items:center;
+      color:#fff;
+      font-size:1.4rem;
+      font-weight:900;
+      box-shadow:0 12px 26px rgba(37,99,235,.22);
+      flex:0 0 auto;
+    }
+    .title{
+      min-width:0;
+    }
+    .title h1{
+      margin:0;
+      font-size:1.55rem;
+      line-height:1.1;
+      letter-spacing:.2px;
+    }
+    .title p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:.95rem;
+    }
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      justify-content:flex-end;
+    }
+    .chip{
+      padding:10px 14px;
+      border:1px solid var(--line);
+      background:linear-gradient(180deg, #fff, #f7fbff);
+      border-radius:999px;
+      font-size:.88rem;
+      color:#334155;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      box-shadow:0 6px 18px rgba(15,23,42,.05);
+      white-space:nowrap;
+    }
+    .dot{
+      width:9px;height:9px;border-radius:50%;
+      background:var(--good);
+      box-shadow:0 0 0 5px rgba(14,165,163,.12);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 320px 1fr 320px;
+      gap:16px;
+      min-height:0;
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:24px;
+      box-shadow:var(--shadow);
+      min-height:0;
+      overflow:hidden;
+    }
+
+    .left,
+    .right{
+      display:flex;
+      flex-direction:column;
+    }
+
+    .section{
+      padding:18px;
+      border-bottom:1px solid #edf2f8;
+    }
+
+    .section h2{
+      margin:0 0 6px;
+      font-size:.85rem;
+      text-transform:uppercase;
+      letter-spacing:.16em;
+      color:#64748b;
+    }
+    .section .sub{
+      margin:0;
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.45;
+    }
+
+    .issue-list{
+      padding:16px 18px 18px;
+      display:grid;
+      gap:12px;
+    }
+    .issue{
+      border:1px solid #e5edf7;
+      background:linear-gradient(180deg, #ffffff, #f8fbff);
+      border-radius:18px;
+      padding:14px;
+      cursor:pointer;
+      transition:.2s ease;
+    }
+    .issue:hover{
+      transform:translateY(-1px);
+      border-color:#bfd8ff;
+      box-shadow:0 12px 24px rgba(37,99,235,.08);
+    }
+    .issue.active{
+      border-color:#93c5fd;
+      box-shadow:0 0 0 1px rgba(37,99,235,.08), 0 12px 22px rgba(37,99,235,.10);
+      background:linear-gradient(180deg, #f8fbff, #eef5ff);
+    }
+    .issue-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      margin-bottom:7px;
+    }
+    .issue-title{
+      margin:0;
+      font-size:1rem;
+      font-weight:800;
+      color:#0f172a;
+    }
+    .tag{
+      font-size:.74rem;
+      color:#1d4ed8;
+      background:#dbeafe;
+      border:1px solid #bfdbfe;
+      padding:5px 10px;
+      border-radius:999px;
+      white-space:nowrap;
+    }
+    .issue-desc{
+      margin:0;
+      color:var(--muted);
+      line-height:1.45;
+      font-size:.9rem;
+    }
+
+    .mini-grid{
+      padding:16px 18px 18px;
+      display:grid;
+      gap:12px;
+    }
+    .mini{
+      background:#f8fbff;
+      border:1px solid #e5edf7;
+      border-radius:18px;
+      padding:14px;
+    }
+    .mini .k{
+      font-size:.76rem;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      color:#64748b;
+      margin-bottom:8px;
+    }
+    .mini .v{
+      font-size:1rem;
+      font-weight:800;
+      color:#0f172a;
+      margin:0;
+    }
+    .mini .small{
+      margin:8px 0 0;
+      color:var(--muted);
+      line-height:1.45;
+      font-size:.88rem;
+    }
+
+    .base-recs{
+      margin-top:auto;
+      padding:16px 18px 18px;
+      border-top:1px solid #edf2f8;
+      background:#fbfdff;
+    }
+    .base-recs h3{
+      margin:0 0 10px;
+      font-size:.95rem;
+      color:#0f172a;
+    }
+    .kb-list{
+      display:grid;
+      gap:8px;
+    }
+    .kb-item{
+      padding:10px 12px;
+      border-radius:14px;
+      background:#eef5ff;
+      border:1px solid #dbeafe;
+      color:#1e40af;
+      font-size:.92rem;
+      font-weight:600;
+    }
+
+    .center{
+      padding:18px;
+      display:grid;
+      grid-template-rows:auto auto 1fr auto;
+      gap:14px;
+      min-height:0;
+    }
+
+    .hero{
+      background:linear-gradient(135deg, #eff6ff 0%, #ffffff 100%);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:16px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      box-shadow:0 10px 30px rgba(15,23,42,.04);
+    }
+    .hero-left h2{
+      margin:0;
+      font-size:1.35rem;
+      color:#0f172a;
+    }
+    .hero-left p{
+      margin:6px 0 0;
+      color:var(--muted);
+      line-height:1.45;
+      font-size:.95rem;
+    }
+    .hero-pill{
+      padding:10px 14px;
+      border-radius:999px;
+      background:#dbeafe;
+      border:1px solid #bfdbfe;
+      color:#1d4ed8;
+      font-weight:700;
+      white-space:nowrap;
+    }
+
+    .steps{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .step{
+      flex:1 1 120px;
+      min-width:120px;
+      border:1px solid #e5edf7;
+      background:#fff;
+      border-radius:16px;
+      padding:10px 12px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#334155;
+      font-size:.84rem;
+    }
+    .step .num{
+      width:26px;height:26px;border-radius:50%;
+      display:grid;place-items:center;
+      background:#e2e8f0;
+      color:#334155;
+      font-weight:800;
+      flex:0 0 auto;
+    }
+    .step.active{
+      border-color:#bfdbfe;
+      background:#eff6ff;
+    }
+    .step.active .num{
+      background:linear-gradient(135deg, var(--brand), var(--brand-3));
+      color:#fff;
+    }
+    .step.done .num{
+      background:linear-gradient(135deg, var(--good), #22c55e);
+      color:#fff;
+    }
+
+    .progress{
+      height:10px;
+      border-radius:999px;
+      background:#e5edf7;
+      overflow:hidden;
+      border:1px solid #dce6f2;
+    }
+    .progress > div{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg, var(--brand), var(--brand-3));
+      border-radius:999px;
+      transition:width .3s ease;
+    }
+
+    .chatbox{
+      min-height:0;
+      overflow:auto;
+      padding-right:6px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .chatbox::-webkit-scrollbar{width:10px}
+    .chatbox::-webkit-scrollbar-thumb{
+      background:#c7d6ea;
+      border-radius:999px;
+    }
+
+    .bubble{
+      max-width:78%;
+      padding:14px 16px;
+      border-radius:20px;
+      line-height:1.55;
+      word-break:break-word;
+      box-shadow:0 10px 20px rgba(15,23,42,.06);
+      animation:pop .16s ease-out;
+    }
+    @keyframes pop{
+      from{transform:translateY(6px); opacity:0}
+      to{transform:translateY(0); opacity:1}
+    }
+    .bot{
+      align-self:flex-start;
+      background:#f8fbff;
+      border:1px solid #e5edf7;
+      color:#0f172a;
+      border-top-left-radius:8px;
+    }
+    .user{
+      align-self:flex-end;
+      background:linear-gradient(135deg, var(--brand), var(--brand-3));
+      color:#fff;
+      border-top-right-radius:8px;
+    }
+    .system{
+      align-self:center;
+      background:#fff7ed;
+      border:1px dashed #fdba74;
+      color:#9a3412;
+      font-size:.92rem;
+      max-width:90%;
+      text-align:center;
+    }
+
+    .final-card{
+      margin-top:4px;
+      padding:14px 16px;
+      border-radius:18px;
+      border:1px solid #dbeafe;
+      background:linear-gradient(180deg, #ffffff, #f8fbff);
+    }
+    .final-card strong{
+      display:block;
+      font-size:1.02rem;
+      margin-bottom:8px;
+      color:#0f172a;
+    }
+    .final-card .meta{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .mini-chip{
+      font-size:.78rem;
+      padding:6px 10px;
+      border-radius:999px;
+      background:#eff6ff;
+      border:1px solid #dbeafe;
+      color:#1d4ed8;
+      font-weight:700;
+    }
+
+    .choices{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .choice{
+      border:none;
+      cursor:pointer;
+      padding:11px 14px;
+      border-radius:999px;
+      background:#eff6ff;
+      color:#1d4ed8;
+      font-weight:800;
+      border:1px solid #dbeafe;
+      transition:.18s ease;
+    }
+    .choice:hover{
+      transform:translateY(-1px);
+      background:#dbeafe;
+    }
+
+    .composer{
+      display:grid;
+      grid-template-columns:1fr auto auto;
+      gap:10px;
+      align-items:center;
+      border-top:1px solid #edf2f8;
+      padding-top:14px;
+    }
+    .composer input{
+      width:100%;
+      border:none;
+      outline:none;
+      padding:14px 16px;
+      border-radius:16px;
+      background:#f8fbff;
+      border:1px solid #dbe5f3;
+      color:#0f172a;
+      font-size:1rem;
+    }
+    .composer input::placeholder{color:#94a3b8}
+    .btn{
+      border:none;
+      outline:none;
+      cursor:pointer;
+      padding:13px 16px;
+      border-radius:16px;
+      font-weight:800;
+      white-space:nowrap;
+      transition:.2s ease;
+    }
+    .btn-primary{
+      background:linear-gradient(135deg, var(--brand), var(--brand-2));
+      color:#fff;
+      box-shadow:0 12px 24px rgba(37,99,235,.18);
+    }
+    .btn-primary:hover{transform:translateY(-1px)}
+    .btn-ghost{
+      background:#f8fbff;
+      color:#0f172a;
+      border:1px solid #dbe5f3;
+    }
+
+    .right{
+      display:flex;
+      flex-direction:column;
+    }
+
+    .diag{
+      padding:16px 18px 18px;
+      display:grid;
+      gap:12px;
+    }
+    .diag-box{
+      background:#f8fbff;
+      border:1px solid #e5edf7;
+      border-radius:18px;
+      padding:14px;
+    }
+    .diag-box .k{
+      margin:0 0 6px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+      font-size:.76rem;
+      color:#64748b;
+    }
+    .diag-box .v{
+      margin:0;
+      font-weight:800;
+      color:#0f172a;
+      font-size:1rem;
+    }
+    .diag-box .small{
+      margin:8px 0 0;
+      color:var(--muted);
+      font-size:.9rem;
+      line-height:1.5;
+    }
+    .meter{
+      margin-top:10px;
+      height:10px;
+      border-radius:999px;
+      background:#e5edf7;
+      overflow:hidden;
+      border:1px solid #dbe5f3;
+    }
+    .meter > div{
+      height:100%;
+      width:0%;
+      border-radius:999px;
+      background:linear-gradient(90deg, var(--good), #22c55e);
+      transition:width .3s ease;
+    }
+
+    .ticket{
+      padding:16px 18px 18px;
+      border-top:1px solid #edf2f8;
+      background:#fbfdff;
+      margin-top:auto;
+    }
+    .ticket h3{
+      margin:0 0 12px;
+      font-size:1rem;
+      color:#0f172a;
+    }
+    .ticket-card{
+      background:#ffffff;
+      border:1px solid #e5edf7;
+      border-radius:18px;
+      padding:14px;
+      display:grid;
+      gap:8px;
+      box-shadow:0 10px 20px rgba(15,23,42,.04);
+    }
+    .ticket-row{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+      font-size:.92rem;
+    }
+    .ticket-row .k{color:#64748b}
+    .ticket-row .v{font-weight:800;color:#0f172a}
+    .ticket-id{
+      font-weight:900;
+      color:#1d4ed8;
+      letter-spacing:.04em;
+    }
+    .ticket-note{
+      color:#64748b;
+      font-size:.9rem;
+      line-height:1.45;
+      margin:0;
+    }
+
+    .kb{
+      padding:16px 18px 18px;
+      border-top:1px solid #edf2f8;
+      background:#fbfdff;
+    }
+    .kb h3{
+      margin:0 0 10px;
+      font-size:.96rem;
+      color:#0f172a;
+    }
+    .kb-list{
+      display:grid;
+      gap:8px;
+    }
+    .kb-item{
+      background:#eef5ff;
+      border:1px solid #dbeafe;
+      border-radius:14px;
+      padding:10px 12px;
+      color:#1d4ed8;
+      font-size:.92rem;
+      font-weight:700;
+    }
+
+    .empty-state{
+      padding:20px;
+      border-radius:18px;
+      border:1px dashed #c7d6ea;
+      color:#64748b;
+      background:#f8fbff;
+      font-size:.92rem;
+    }
+
+    @media (max-width: 1180px){
+      .grid{grid-template-columns:1fr}
+      .left{order:2}
+      .center{order:1}
+      .right{order:3}
+    }
+    @media (max-width: 640px){
+      .topbar{flex-direction:column; align-items:flex-start}
+      .chips{justify-content:flex-start}
+      .composer{grid-template-columns:1fr}
+      .bubble{max-width:92%}
+      .steps{display:grid; grid-template-columns:1fr 1fr}
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="logo">R</div>
+        <div class="title">
+          <h1>ResolveIQ</h1>
+          <p>AI-Powered Customer Support Assistant</p>
+        </div>
+      </div>
+      <div class="chips">
+        <div class="chip"><span class="dot"></span> Support workflow demo</div>
+        <div class="chip">Professional resolution assistant</div>
+      </div>
+    </header>
+
+    <main class="grid">
+      <aside class="card left">
+        <div class="section">
+          <h2>Issue Library</h2>
+          <p class="sub">Choose the customer problem you want ResolveIQ to diagnose.</p>
+        </div>
+
+        <div class="issue-list" id="issueList">
+          <div class="issue active" data-scenario="internet">
+            <div class="issue-top">
+              <p class="issue-title">🌐 Internet Not Working</p>
+              <span class="tag">Fast diagnosis</span>
+            </div>
+            <p class="issue-desc">Checks router lights, connectivity, and application-specific problems.</p>
+          </div>
+
+          <div class="issue" data-scenario="slow">
+            <div class="issue-top">
+              <p class="issue-title">⚡ Slow Internet</p>
+              <span class="tag">Performance</span>
+            </div>
+            <p class="issue-desc">Examines device-wide issues, bandwidth congestion, and background activity.</p>
+          </div>
+
+          <div class="issue" data-scenario="wifi">
+            <div class="issue-top">
+              <p class="issue-title">📶 Wi‑Fi Connected, No Access</p>
+              <span class="tag">Gateway / DNS</span>
+            </div>
+            <p class="issue-desc">Guides the user through reconnection and gateway checks before escalation.</p>
+          </div>
+        </div>
+
+        <div class="kb">
+          <h3>Knowledge Base Suggestions</h3>
+          <div class="kb-list" id="kbList">
+            <div class="kb-item">Restart Router Guide</div>
+            <div class="kb-item">Wi‑Fi Reconnection Steps</div>
+            <div class="kb-item">Support Ticket Creation Process</div>
+          </div>
+        </div>
+      </aside>
+
+      <section class="card center">
+        <div class="hero">
+          <div class="hero-left">
+            <h2>ResolveIQ</h2>
+            <p>Intelligent connectivity support assistant with guided troubleshooting, clear escalation, and customer-friendly messaging.</p>
+          </div>
+          <div class="hero-pill" id="heroState">Ready</div>
+        </div>
+
+        <div class="steps" id="steps">
+          <div class="step active"><div class="num">1</div> Select Issue</div>
+          <div class="step"><div class="num">2</div> Diagnose</div>
+          <div class="step"><div class="num">3</div> Resolve</div>
+          <div class="step"><div class="num">4</div> Escalate</div>
+        </div>
+
+        <div class="progress"><div id="progressBar"></div></div>
+
+        <div class="chatbox" id="chatbox">
+          <div class="bubble bot">
+            Welcome to <strong>ResolveIQ</strong>.<br>
+            Please choose a scenario from the Issue Library to begin the troubleshooting flow.
+          </div>
+          <div class="empty-state" id="emptyState">
+            Tip: after starting a scenario, reply with <strong>Yes</strong> or <strong>No</strong>. If a response is invalid, the assistant will ask again.
+          </div>
+        </div>
+
+        <div class="choices" id="choices"></div>
+
+        <div class="composer">
+          <input id="userInput" type="text" placeholder="Choose a scenario to begin..." autocomplete="off" />
+          <button class="btn btn-primary" id="sendBtn">Send</button>
+          <button class="btn btn-ghost" id="resetBtn">Reset</button>
+        </div>
+      </section>
+
+      <aside class="card right">
+        <div class="section">
+          <h2>Diagnosis Panel</h2>
+          <p class="sub">Live status and next action based on the user’s answers.</p>
+        </div>
+
+        <div class="diag">
+          <div class="diag-box">
+            <p class="k">Current Issue</p>
+            <p class="v" id="statIssue">Not selected</p>
+            <p class="small" id="statSub">Choose a scenario to start.</p>
+          </div>
+
+          <div class="diag-box">
+            <p class="k">Confidence</p>
+            <p class="v" id="statConfidence">—</p>
+            <div class="meter"><div id="confidenceBar"></div></div>
+          </div>
+
+          <div class="diag-box">
+            <p class="k">Recommended Action</p>
+            <p class="v" id="statAction">Awaiting user input</p>
+            <p class="small" id="statActionSub">The assistant will suggest a fix or escalation step.</p>
+          </div>
+        </div>
+
+        <div class="ticket">
+          <h3>Ticket / Resolution Summary</h3>
+          <div class="ticket-card">
+            <div class="ticket-row">
+              <span class="k">Ticket ID</span>
+              <span class="v ticket-id" id="ticketId">—</span>
+            </div>
+            <div class="ticket-row">
+              <span class="k">Priority</span>
+              <span class="v" id="ticketPriority">—</span>
+            </div>
+            <div class="ticket-row">
+              <span class="k">Status</span>
+              <span class="v" id="ticketStatus">Awaiting diagnosis</span>
+            </div>
+            <p class="ticket-note" id="ticketNote">
+              Unresolved issues will be escalated with a clear support summary.
+            </p>
+          </div>
+        </div>
+      </aside>
+    </main>
+  </div>
+
+  <script>
+    const flows = {
+      internet: {
+        label: "Internet Not Working",
+        subtitle: "Connectivity issue",
+        intro: "Let's quickly diagnose whether the issue is related to router power, network connectivity, or an application-specific problem.",
+        steps: [
+          {
+            q: "Are the router lights ON?",
+            hint: "Check the power, WAN, and Wi‑Fi indicators.",
+            options: ["yes", "no"],
+            next: { yes: 1, no: 2 }
+          },
+          {
+            q: "Can you open any website in your browser?",
+            hint: "This helps separate a full network issue from an application-specific one.",
+            options: ["yes", "no"],
+            next: { yes: "final_app", no: 3 }
+          },
+          {
+            q: "After restarting the router, are the lights ON now?",
+            hint: "Restarting often fixes power or sync issues.",
+            options: ["yes", "no"],
+            next: { yes: "final_router", no: "final_ticket_power" }
+          },
+          {
+            q: "Did reconnecting to Wi‑Fi fix the issue?",
+            hint: "Reconnecting refreshes the network handshake.",
+            options: ["yes", "no"],
+            next: { yes: "final_sync", no: "final_ticket_network" }
+          }
+        ],
+        finals: {
+          final_app: {
+            title: "Application-Specific Issue",
+            text: "The internet is working, but one application or website may be having a problem.",
+            confidence: 78,
+            action: "Check the affected application",
+            priority: "Low",
+            status: "Resolved"
+          },
+          final_router: {
+            title: "Router Power Issue Resolved",
+            text: "The issue was likely related to router power or initial restart. Connection is restored.",
+            confidence: 92,
+            action: "Confirm connection stability",
+            priority: "Low",
+            status: "Resolved"
+          },
+          final_ticket_power: {
+            title: "Escalation Required",
+            text: "Router restart did not help. Please create a support ticket for hardware or ISP inspection.",
+            confidence: 95,
+            action: "Create support ticket",
+            priority: "High",
+            status: "Escalated"
+          },
+          final_sync: {
+            title: "Temporary Network Sync Issue",
+            text: "Reconnecting Wi‑Fi restored access. The issue was likely a temporary connectivity sync problem.",
+            confidence: 86,
+            action: "Monitor connection",
+            priority: "Medium",
+            status: "Resolved"
+          },
+          final_ticket_network: {
+            title: "Network Connectivity Failure",
+            text: "The issue remains after reconnecting Wi‑Fi. Please create a support ticket for further investigation.",
+            confidence: 94,
+            action: "Create support ticket",
+            priority: "High",
+            status: "Escalated"
+          }
+        }
+      },
+      slow: {
+        label: "Slow Internet",
+        subtitle: "Performance issue",
+        intro: "Let's check whether the slowdown is device-specific, congestion-related, or caused by background activity.",
+        steps: [
+          {
+            q: "Is the slow speed happening on all devices?",
+            hint: "If only one device is affected, the issue may be local to that device.",
+            options: ["yes", "no"],
+            next: { yes: 1, no: "final_device" }
+          },
+          {
+            q: "Did the speed test show lower than the promised speed?",
+            hint: "Use a speed test result if available.",
+            options: ["yes", "no"],
+            next: { yes: "final_congestion", no: "final_background" }
+          }
+        ],
+        finals: {
+          final_device: {
+            title: "Device-Specific Issue",
+            text: "Only one device is affected, so the slowdown is likely local to that device.",
+            confidence: 80,
+            action: "Restart the device",
+            priority: "Low",
+            status: "Resolved"
+          },
+          final_congestion: {
+            title: "Bandwidth Congestion",
+            text: "The speed test is below the expected limit, so the network may be congested or overloaded.",
+            confidence: 88,
+            action: "Check traffic load",
+            priority: "Medium",
+            status: "Investigate"
+          },
+          final_background: {
+            title: "Background Activity Detected",
+            text: "The connection itself is not severely degraded. Background downloads or apps may be consuming bandwidth.",
+            confidence: 84,
+            action: "Close background apps",
+            priority: "Low",
+            status: "Resolved"
+          }
+        }
+      },
+      wifi: {
+        label: "Wi‑Fi Connected, No Access",
+        subtitle: "Gateway / DNS issue",
+        intro: "Let's see whether this is a local router, DNS, or reconnection issue.",
+        steps: [
+          {
+            q: "Is Wi‑Fi connected but websites are not loading?",
+            hint: "This usually means the network is connected, but internet access is blocked or misconfigured.",
+            options: ["yes", "no"],
+            next: { yes: 1, no: "final_notthis" }
+          },
+          {
+            q: "Can you open the router login page?",
+            hint: "This helps us check whether local network access is working.",
+            options: ["yes", "no"],
+            next: { yes: "final_dns", no: 2 }
+          },
+          {
+            q: "After reconnecting or restarting the router, is access restored?",
+            hint: "Refreshing the connection can solve gateway-related issues.",
+            options: ["yes", "no"],
+            next: { yes: "final_reconnect", no: "final_ticket_gateway" }
+          }
+        ],
+        finals: {
+          final_notthis: {
+            title: "Different Issue",
+            text: "The selected scenario does not match the current problem closely.",
+            confidence: 70,
+            action: "Select the correct issue",
+            priority: "Low",
+            status: "Needs review"
+          },
+          final_dns: {
+            title: "DNS / Gateway Issue",
+            text: "The local router page is reachable, so the issue may be DNS or internet gateway related.",
+            confidence: 87,
+            action: "Check DNS / gateway settings",
+            priority: "Medium",
+            status: "Investigate"
+          },
+          final_reconnect: {
+            title: "Connection Restored",
+            text: "Reconnection or router restart resolved the problem.",
+            confidence: 90,
+            action: "Confirm access",
+            priority: "Low",
+            status: "Resolved"
+          },
+          final_ticket_gateway: {
+            title: "Escalation Required",
+            text: "The issue is still present after restart and reconnection. Please create a support ticket.",
+            confidence: 95,
+            action: "Create support ticket",
+            priority: "High",
+            status: "Escalated"
+          }
+        }
+      }
+    };
+
+    const state = {
+      scenario: null,
+      step: 0,
+      finished: false
+    };
+
+    const chatbox = document.getElementById("chatbox");
+    const choices = document.getElementById("choices");
+    const input = document.getElementById("userInput");
+    const sendBtn = document.getElementById("sendBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const issueList = [...document.querySelectorAll(".issue")];
+    let emptyState = document.getElementById("emptyState");
+    const stepEls = [...document.querySelectorAll(".step")];
+
+    const heroState = document.getElementById("heroState");
+    const progressBar = document.getElementById("progressBar");
+
+    const statIssue = document.getElementById("statIssue");
+    const statSub = document.getElementById("statSub");
+    const statConfidence = document.getElementById("statConfidence");
+    const confidenceBar = document.getElementById("confidenceBar");
+    const statAction = document.getElementById("statAction");
+    const statActionSub = document.getElementById("statActionSub");
+    const ticketId = document.getElementById("ticketId");
+    const ticketPriority = document.getElementById("ticketPriority");
+    const ticketStatus = document.getElementById("ticketStatus");
+    const ticketNote = document.getElementById("ticketNote");
+
+    function escapeHtml(str){
+      return String(str).replace(/[&<>"']/g, ch => ({
+        "&":"&amp;",
+        "<":"&lt;",
+        ">":"&gt;",
+        '"':"&quot;",
+        "'":"&#039;"
+      }[ch]));
+    }
+
+    function renderInputChoiceLabels(options){
+      choices.innerHTML = "";
+      options.forEach(option => {
+        const b = document.createElement("button");
+        b.className = "choice";
+        b.textContent = option === "yes" ? "Yes" : "No";
+        b.addEventListener("click", () => handleInput(option));
+        choices.appendChild(b);
+      });
+    }
+
+    function clearChoices(){
+      choices.innerHTML = "";
+    }
+
+    function setStepper(index){
+      stepEls.forEach((step, i) => {
+        step.classList.toggle("active", i === index);
+        step.classList.toggle("done", i < index);
+      });
+
+      const pct = index === 0 ? 12 : index === 1 ? 40 : index === 2 ? 68 : 100;
+      progressBar.style.width = `${pct}%`;
+    }
+
+    function addBubble(type, html){
+      const div = document.createElement("div");
+      div.className = `bubble ${type}`;
+      div.innerHTML = html;
+      chatbox.appendChild(div);
+      chatbox.scrollTop = chatbox.scrollHeight;
+      emptyState.style.display = "none";
+      return div;
+    }
+
+    function addSystem(html){
+      const div = document.createElement("div");
+      div.className = "bubble system";
+      div.innerHTML = html;
+      chatbox.appendChild(div);
+      chatbox.scrollTop = chatbox.scrollHeight;
+      emptyState.style.display = "none";
+      return div;
+    }
+
+    function updateRightPanel(issue, subtitle, confidence, action, actionSub, ticket = null){
+      statIssue.textContent = issue || "Not selected";
+      statSub.textContent = subtitle || "Choose a scenario to start.";
+      statConfidence.textContent = confidence ? `${confidence}%` : "—";
+      confidenceBar.style.width = confidence ? `${confidence}%` : "0%";
+      statAction.textContent = action || "Awaiting user input";
+      statActionSub.textContent = actionSub || "The assistant will suggest a fix or escalation step.";
+
+      if(ticket){
+        ticketId.textContent = ticket.id;
+        ticketPriority.textContent = ticket.priority;
+        ticketStatus.textContent = ticket.status;
+        ticketNote.textContent = ticket.note;
+      }else{
+        ticketId.textContent = "—";
+        ticketPriority.textContent = "—";
+        ticketStatus.textContent = "Awaiting diagnosis";
+        ticketNote.textContent = "Unresolved issues will be escalated with a clear support summary.";
+      }
+    }
+
+    function scenarioIntro(key){
+      const flow = flows[key];
+      state.scenario = key;
+      state.step = 0;
+      state.finished = false;
+
+      issueList.forEach(card => card.classList.toggle("active", card.dataset.scenario === key));
+
+      chatbox.innerHTML = "";
+      addBubble("bot", `
+        Welcome to <strong>ResolveIQ</strong>.<br>
+        You're now in the <strong>${flow.label}</strong> flow.<br><br>
+        ${flow.intro}<br><br>
+        <strong>${flow.steps[0].q}</strong>
+        <div class="hint">${flow.steps[0].hint}</div>
+      `);
+
+      clearChoices();
+      renderInputChoiceLabels(flow.steps[0].options);
+      setStepper(1);
+      heroState.textContent = "Diagnosing";
+      updateRightPanel(flow.label, flow.subtitle, null, "Awaiting response", flow.intro);
+
+      input.value = "";
+      input.placeholder = "Type yes or no...";
+    }
+
+    function renderFinal(finalKey){
+      const flow = flows[state.scenario];
+      const final = flow.finals[finalKey];
+      state.finished = true;
+
+      addBubble("bot", `
+        <div class="final-card">
+          <strong>${final.title}</strong>
+          ${final.text}
+          <div class="meta">
+            <span class="mini-chip">Confidence: ${final.confidence}%</span>
+            <span class="mini-chip">Priority: ${final.priority}</span>
+            <span class="mini-chip">Status: ${final.status}</span>
+          </div>
+        </div>
+      `);
+
+      clearChoices();
+      input.placeholder = "Type restart to try another scenario...";
+      heroState.textContent = final.status === "Escalated" ? "Ticket created" : "Resolved";
+      setStepper(3);
+
+      const ticketData = final.status === "Escalated"
+        ? {
+            id: `RQ-${Math.floor(1000 + Math.random() * 9000)}`,
+            priority: final.priority,
+            status: "Open",
+            note: "Issue escalated with troubleshooting summary and user response history."
+          }
+        : {
+            id: `RQ-${Math.floor(1000 + Math.random() * 9000)}`,
+            priority: final.priority,
+            status: "Closed",
+            note: "Issue resolved through guided troubleshooting."
+          };
+
+      updateRightPanel(
+        flow.label,
+        flow.subtitle,
+        final.confidence,
+        final.action,
+        final.text,
+        ticketData
+      );
+    }
+
+    function renderNextQuestion(node){
+      addBubble("bot", `
+        <strong>${node.q}</strong>
+        <div class="hint">${node.hint}</div>
+      `);
+      renderInputChoiceLabels(node.options);
+    }
+
+    function handleInput(raw){
+      const text = String(raw || "").trim().toLowerCase();
+      if(!text){
+        addSystem("Please enter a valid response to continue.");
+        return;
+      }
+
+      if(text === "restart" || text === "reset"){
+        resetAll();
+        return;
+      }
+
+      if(!state.scenario){
+        if(text.includes("internet") || text === "1"){
+          scenarioIntro("internet");
+          return;
+        }
+        if(text.includes("slow") || text.includes("performance") || text === "2"){
+          scenarioIntro("slow");
+          return;
+        }
+        if(text.includes("wifi") || text.includes("wi-fi") || text.includes("no internet") || text === "3"){
+          scenarioIntro("wifi");
+          return;
+        }
+        addSystem("Please choose a scenario from the Issue Library to begin.");
+        return;
+      }
+
+      if(state.finished){
+        addSystem("Type <strong>restart</strong> to begin a new troubleshooting flow.");
+        return;
+      }
+
+      if(text !== "yes" && text !== "no"){
+        addSystem("Please reply with <strong>Yes</strong> or <strong>No</strong> only.");
+        return;
+      }
+
+      const flow = flows[state.scenario];
+      const node = flow.steps[state.step];
+
+      addBubble("user", escapeHtml(text.toUpperCase()));
+
+      const next = node.next[text];
+
+      if(typeof next === "number"){
+        state.step = next;
+        setStepper(Math.min(next + 1, 2));
+        const nextNode = flow.steps[state.step];
+        heroState.textContent = "Diagnosing";
+        updateRightPanel(flow.label, flow.subtitle, 55 + (next * 8), "Continue troubleshooting", nextNode.hint);
+        renderNextQuestion(nextNode);
+        input.value = "";
+        return;
+      }
+
+      renderFinal(next);
+      input.value = "";
+    }
+
+    function resetAll(){
+      state.scenario = null;
+      state.step = 0;
+      state.finished = false;
+
+      issueList.forEach(card => card.classList.remove("active"));
+      chatbox.innerHTML = `
+        <div class="bubble bot">
+          Welcome to <strong>ResolveIQ</strong>.<br>
+          Please choose a scenario from the Issue Library to begin the troubleshooting flow.
+        </div>
+        <div class="empty-state" id="emptyState">
+          Tip: after starting a scenario, reply with <strong>Yes</strong> or <strong>No</strong>. If a response is invalid, the assistant will ask again.
+        </div>
+      `;
+
+      clearChoices();
+      heroState.textContent = "Ready";
+      setStepper(0);
+      updateRightPanel(null, null, null, null, null, null);
+      input.value = "";
+      input.placeholder = "Choose a scenario to begin...";
+      input.focus();
+
+      // rebind emptyState reference after replacing chatbox content
+      emptyState = document.getElementById("emptyState");
+    }
+
+    sendBtn.addEventListener("click", () => handleInput(input.value));
+    input.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") handleInput(input.value);
+    });
+    resetBtn.addEventListener("click", resetAll);
+
+    issueList.forEach(card => {
+      card.addEventListener("click", () => scenarioIntro(card.dataset.scenario));
+    });
+
+    // initial state
+    clearChoices();
+    setStepper(0);
+    updateRightPanel(null, null, null, null, null, null);
+    input.focus();
+  </script>
+</body>
+</html>
